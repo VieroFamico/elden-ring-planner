@@ -13,7 +13,7 @@ export default function Stats() {
             <h2>Total Equip Load: {totalWeight.toFixed(1)}</h2>
             <ul>
                 {equippedWeapons.map(weapon => (
-                    <li key={weapon.id}>{weapon.name}</li>
+                    <li key={weapon.instanceId}>{weapon.name}</li>
                 ))}
             </ul>
         </div>

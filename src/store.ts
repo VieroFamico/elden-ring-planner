@@ -1,10 +1,10 @@
 import { create } from 'zustand';
-import type { Weapon } from './types';
+import type { Weapon, EquippedWeapon } from './types';
 
 interface LoadoutState {
-    equippedWeapons: Weapon[];  
+    equippedWeapons: EquippedWeapon[];
     equipWeapon: (weapon: Weapon) => void;  
-    unequipWeapon: (id: string) => void;     
+    unequipWeapon: (instanceId: string) => void;     
 }
 
 export const useLoadoutStore = create<LoadoutState>((set) => ({
@@ -13,11 +13,19 @@ export const useLoadoutStore = create<LoadoutState>((set) => ({
     equipWeapon: (weapon) =>
         set((state) => {
             if (state.equippedWeapons.length >= 6) return state;
-            return { equippedWeapons: [...state.equippedWeapons, weapon] };
+
+            // Create a unique copy of the weapon using the browser's crypto API
+            const newEquippedWeapon: EquippedWeapon = {
+                ...weapon,
+                instanceId: crypto.randomUUID()
+            };
+
+            return { equippedWeapons: [...state.equippedWeapons, newEquippedWeapon] };
         }),
 
-    unequipWeapon: (id) =>
+    unequipWeapon: (instanceId) =>
         set((state) => ({
-            equippedWeapons: state.equippedWeapons.filter(w => w.id !== id)
+            // Filter by the unique instanceId, not the API id
+            equippedWeapons: state.equippedWeapons.filter(w => w.instanceId !== instanceId)
         })),
 }));

@@ -4,3 +4,7 @@ export interface Weapon {
     image: string;
     weight: number;
 }
+
+export interface EquippedWeapon extends Weapon {
+    instanceId: string;
+}

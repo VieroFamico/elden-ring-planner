@@ -50,10 +50,10 @@ export default function Inventory() {
                 <h3 className="text-lg mb-4">Total Weight: <span className="text-white font-mono">{totalWeight.toFixed(1)}</span></h3>
                 <ul className="space-y-3">
                     {equippedWeapons.map(weapon => (
-                        <li key={weapon.id} className="flex justify-between items-center bg-neutral-900 p-3 rounded border border-neutral-700">
+                        <li key={weapon.instanceId} className="flex justify-between items-center bg-neutral-900 p-3 rounded border border-neutral-700">
                             <span className="font-medium">{weapon.name}</span>
                             <button
-                                onClick={() => unequipWeapon(weapon.id)}
+                                onClick={() => unequipWeapon(weapon.instanceId)}
                                 className="text-red-400 hover:text-red-300 text-sm font-bold uppercase"
                             >
                                 Remove
