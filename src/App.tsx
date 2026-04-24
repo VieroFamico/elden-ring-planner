@@ -7,15 +7,15 @@ export default function App() {
   return (
     <BrowserRouter>
       {/* Dark theme wrapper */}
-      <div className="min-h-screen bg-neutral-900 text-neutral-100 font-sans">
+      <div className="min-h-screen bg-[#121212] text-neutral-300 font-sans">
 
         {/* Navigation Bar */}
-        <nav className="bg-neutral-800 border-b border-neutral-700 p-4 shadow-md">
+        <nav className="bg-[#1a1a1a] border-b border-neutral-800 p-4 shadow-sm">
           <div className="max-w-6xl mx-auto flex gap-6">
-            <Link to="/" className="text-yellow-500 hover:text-yellow-400 font-semibold transition-colors">
+            <Link to="/" className="text-orange-200/80 hover:text-orange-200 font-medium transition-colors">
               Inventory
             </Link>
-            <Link to="/stats" className="text-neutral-300 hover:text-white transition-colors">
+            <Link to="/stats" className="text-orange-200/80 hover:text-orange-200 font-medium transition-colors">
               Character Stats
             </Link>
           </div>
