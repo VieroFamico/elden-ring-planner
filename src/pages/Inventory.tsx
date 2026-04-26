@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import type { Weapon } from '../types';
+import type { Equipment } from '../types';
 import { useLoadoutStore } from '../store';
 
 export default function Inventory() {
-    const [weapons, setWeapons] = useState<Weapon[]>([]);
+    const [weapons, setWeapons] = useState<Equipment[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
 
     // 1. Add the Async States
