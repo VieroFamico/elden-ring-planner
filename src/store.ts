@@ -4,11 +4,11 @@ import type { Equipment, EquippedItem } from './types';
 
 interface LoadoutState {
     equippedWeapons: EquippedItem[];
-    equippedArmor: EquippedItem[]; // New Armor Array
+    equippedArmor: EquippedItem[]
     equipWeapon: (item: Equipment) => void;
     unequipWeapon: (instanceId: string) => void;
-    equipArmor: (item: Equipment) => void; // New Armor Action
-    unequipArmor: (instanceId: string) => void; // New Armor Action
+    equipArmor: (item: Equipment) => void;
+    unequipArmor: (instanceId: string) => void;
 }
 
 export const useLoadoutStore = create<LoadoutState>()(

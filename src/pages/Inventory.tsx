@@ -1,60 +1,85 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type { Equipment } from '../types';
 import { useLoadoutStore } from '../store';
+import { useQuery } from '@tanstack/react-query';
 
 export default function Inventory() {
-    const [weapons, setWeapons] = useState<Equipment[]>([]);
+    // const [weapons, setWeapons] = useState<Equipment[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
-
-    // 1. Add the Async States
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
+    const [activeTab, setActiveTab] = useState<'weapons' | 'armors'>('weapons');
+    
     const equippedWeapons = useLoadoutStore((state) => state.equippedWeapons);
+    const equippedArmors = useLoadoutStore((state) => state.equippedArmor);
     const equipWeapon = useLoadoutStore((state) => state.equipWeapon);
     const unequipWeapon = useLoadoutStore((state) => state.unequipWeapon);
+    const equipArmor = useLoadoutStore((state) => state.equipArmor);
+    //const unequipArmor = useLoadoutStore((state) => state.unequipArmor);
 
-    useEffect(() => {
-        fetch('https://eldenring.fanapis.com/api/weapons?limit=20')
-            .then(response => {
-                // Intercept bad server responses (like 404 or 500 errors)
-                if (!response.ok) throw new Error('Failed to fetch data from the server.');
-                return response.json();
-            })
-            .then(json => setWeapons(json.data))
-            // Error Catch
-            .catch (err => setError(err.message))
-            .finally(() => setIsLoading(false));
-    }, []);
+    // const [isLoading, setIsLoading] = useState(true);
+    // const [error, setError] = useState<string | null>(null);
+
+    // useEffect(() => {
+    //     fetch('https://eldenring.fanapis.com/api/weapons?limit=20')
+    //         .then(response => {
+    //             // Intercept bad server responses (like 404 or 500 errors)
+    //             if (!response.ok) throw new Error('Failed to fetch data from the server.');
+    //             return response.json();
+    //         })
+    //         .then(json => setWeapons(json.data))
+    //         // Error Catch
+    //         .catch (err => setError(err.message))
+    //         .finally(() => setIsLoading(false));
+    // }, []);
+
+    const { data: equipmentList = [], isLoading, error } = useQuery({
+        // activeTab so that query can differentiate between weapons and armors
+        queryKey: ['equipment', activeTab],
+
+        queryFn: async () => {
+            // The URL dynamically injects 'weapons' or 'armors' based on the activeTab's name (need to make sure its correctly named)
+            const response = await fetch(`https://eldenring.fanapis.com/api/${activeTab}?limit=20`);
+            if (!response.ok) throw new Error('Failed to fetch data');
+            const json = await response.json();
+            return json.data as Equipment[];
+        }
+    });
     
-    const totalWeight = equippedWeapons.reduce((sum, weapon) => sum + weapon.weight, 0);
+    const totalWeight = equippedWeapons.reduce((sum, weapon) => sum + weapon.weight, 0) + equippedArmors.reduce((sum, armor) => sum + armor.weight, 0);
 
-    const filteredWeapons = weapons.filter(weapon =>
-        weapon.name.toLowerCase().includes(searchQuery.toLowerCase())
+    const filteredEquipments = equipmentList.filter(equipment =>
+        equipment.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     const FilteredWeaponsPart = 
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Filtered Weapon */}
-        {filteredWeapons.map(weapon => (
-            <div key={weapon.id} className="bg-[#1e1e1e] p-4 rounded-lg border border-neutral-800 flex flex-col justify-between">
+        {filteredEquipments.map(item => (
+            <div key={item.id} className="bg-[#1e1e1e] p-4 rounded-lg border border-neutral-800 flex flex-col justify-between">
                 <div>
-                    <h3 className="font-bold text-lg text-neutral-200">{weapon.name}</h3>
-                    <p className="text-neutral-500 text-sm mt-1">Weight: {weapon.weight}</p>
+                    <h3 className="font-bold text-lg text-neutral-200">{item.name}</h3>
+                    <p className="text-neutral-500 text-sm mt-1">Weight: {item.weight}</p>
                 </div>
                 {/* Minimalist translucent button */}
                 <button
-                    onClick={() => equipWeapon(weapon)}
-                    disabled={equippedWeapons.length >= 6}
+                    onClick={
+                        activeTab === 'weapons' ? () => equipWeapon(item) : 
+                        activeTab === 'armors' ? () => equipArmor(item) : 
+                        () => {}
+                    }
+                    disabled={
+                        activeTab === 'weapons' ? equippedWeapons.length >= 6 :
+                        activeTab === 'armors' ? equippedArmors.length >= 4 : false
+                    }
                     className="mt-4 bg-orange-900/20 hover:bg-orange-900/40 text-orange-200/90 border border-orange-900/50 disabled:bg-[#1a1a1a] disabled:text-neutral-600 disabled:border-neutral-800 font-medium py-2 px-4 rounded transition-colors"
                 >
-                    {equippedWeapons.length >= 6 ? 'Limit Reached' : 'Equip'}
+                    {activeTab === 'weapons' ? (equippedWeapons.length >= 6 ? 'Limit Reached' : 'Equip') : 
+                     activeTab === 'armors' ? (equippedArmors.length >= 4 ? 'Limit Reached' : 'Equip') : ''}
                 </button>
             </div>
         ))}
         
         {/* If no result, show a message */}
-        {filteredWeapons.length === 0 && (
+        {filteredEquipments.length === 0 && (
             <p className="text-neutral-600 italic col-span-2">No weapons found matching "{searchQuery}".</p>
         )}
     </div>;
@@ -66,7 +91,22 @@ export default function Inventory() {
             <div className="lg:col-span-2">
                 <div className="flex justify-between items-end mb-6 border-b border-neutral-800 pb-2">
                     <h2 className="text-2xl font-bold text-orange-200/80">
-                        Available Weapons
+                        <div className="flex gap-6">
+                            <button
+                                onClick={() => setActiveTab('weapons')}
+                                className={`text-2xl font-bold transition-colors ${activeTab === 'weapons' ? 'text-orange-200/80' : 'text-neutral-600 hover:text-neutral-400'
+                                }`}
+                            >
+                                Weapons
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('armors')}
+                                className={`text-2xl font-bold transition-colors ${activeTab === 'armors' ? 'text-orange-200/80' : 'text-neutral-600 hover:text-neutral-400'
+                                }`}
+                            >
+                                Armor
+                            </button>
+                        </div>
                     </h2>
                     {/* The Search Input */}
                     <input
@@ -95,7 +135,7 @@ export default function Inventory() {
                 ) : error ? (
                     /* Error */
                     <div className="bg-red-950/30 text-rose-300 p-4 rounded-lg border border-red-900/50 font-medium">
-                        Error: {error}
+                        Error
                     </div>
                 ) : FilteredWeaponsPart
                 }
