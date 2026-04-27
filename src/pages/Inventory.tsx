@@ -13,7 +13,7 @@ export default function Inventory() {
     const equipWeapon = useLoadoutStore((state) => state.equipWeapon);
     const unequipWeapon = useLoadoutStore((state) => state.unequipWeapon);
     const equipArmor = useLoadoutStore((state) => state.equipArmor);
-    //const unequipArmor = useLoadoutStore((state) => state.unequipArmor);
+    const unequipArmor = useLoadoutStore((state) => state.unequipArmor);
 
     // const [isLoading, setIsLoading] = useState(true);
     // const [error, setError] = useState<string | null>(null);
@@ -147,23 +147,59 @@ export default function Inventory() {
                     My Loadout
                 </h2>
                 <h3 className="text-lg mb-4 text-neutral-400">Total Weight: <span className="text-neutral-200 font-mono">{totalWeight.toFixed(1)}</span></h3>
-                <ul className="space-y-3">
-                    {equippedWeapons.map(weapon => (
-                        <li key={weapon.instanceId} className="flex justify-between items-center bg-[#1a1a1a] p-3 rounded border border-neutral-800">
-                            <span className="font-medium text-neutral-300">{weapon.name}</span>
-                            <button
-                                onClick={() => unequipWeapon(weapon.instanceId)}
-                                className="text-rose-900 hover:text-rose-700 text-sm font-bold uppercase transition-colors"
-                            >
-                                Remove
-                            </button>
-                        </li>
-                    ))}
-                    {equippedWeapons.length === 0 && (
-                        <p className="text-neutral-600 italic text-sm">No weapons equipped.</p>
-                    )}
-                </ul>
+
+                {/* Weapons Section */}
+                <div className="mb-6">
+                    {/* Weapons Header */}
+                    <h4 className="text-sm uppercase tracking-widest text-orange-200/60 mb-3 border-b border-neutral-800/50 pb-1">
+                        Weapons ({equippedWeapons.length}/6)
+                    </h4>
+                    {/* Weapons List */}
+                    <ul className="space-y-3">
+                        {equippedWeapons.map(item => (
+                            <li key={item.instanceId} className="flex justify-between items-center bg-[#1a1a1a] p-2 rounded border border-neutral-800">
+                                <span className="font-medium text-neutral-300 text-sm">{item.name}</span>
+                                <button
+                                    onClick={() => unequipWeapon(item.instanceId)}
+                                    className="text-rose-900 hover:text-rose-700 text-xs font-bold uppercase transition-colors"
+                                >
+                                    Remove
+                                </button>
+                            </li>
+                        ))}
+                        {equippedWeapons.length === 0 && (
+                            <p className="text-neutral-600 italic text-sm">No weapons equipped.</p>
+                        )}
+                    </ul>
+                </div>
+
+                {/* Armor Section */}
+                <div>
+                    {/* Armor Header */}
+                    <h4 className="text-sm uppercase tracking-widest text-orange-200/60 mb-3 border-b border-neutral-800/50 pb-1">
+                        Armor ({equippedArmors.length}/4)
+                    </h4>
+                    {/* Armor List */}
+                    <ul className="space-y-3">
+                        {equippedArmors.map(item => (
+                            <li key={item.instanceId} className="flex justify-between items-center bg-[#1a1a1a] p-2 rounded border border-neutral-800">
+                                <span className="font-medium text-neutral-300 text-sm">{item.name}</span>
+                                <button
+                                    onClick={() => unequipArmor(item.instanceId)}
+                                    className="text-rose-900 hover:text-rose-700 text-xs font-bold uppercase transition-colors"
+                                >
+                                    Remove
+                                </button>
+                            </li>
+                        ))}
+                        {equippedArmors.length === 0 && (
+                            <p className="text-neutral-600 italic text-xs">No armor equipped.</p>
+                        )}
+                    </ul>
+                </div>
             </div>
+
+            
         </div>
     );
 }
