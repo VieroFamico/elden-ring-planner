@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { Equipment } from '../types';
+import { SortOrder, type Equipment, type SortOrderType } from '../types';
 import { useLoadoutStore } from '../store';
 import { useQuery } from '@tanstack/react-query';
 
@@ -7,6 +7,7 @@ export default function Inventory() {
     // const [weapons, setWeapons] = useState<Equipment[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [activeTab, setActiveTab] = useState<'weapons' | 'armors'>('weapons');
+    const [sortOrder, setSortOrder] = useState<SortOrderType>(SortOrder.LightToHeavy);
     
     const equippedWeapons = useLoadoutStore((state) => state.equippedWeapons);
     const equippedArmors = useLoadoutStore((state) => state.equippedArmor);
